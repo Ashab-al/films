@@ -55,7 +55,7 @@ def get_all_the_top_movie_pages():
     
 
 
-#output_of_all_genres
+#вывод всех жанров
 def we_get_all_genres():
     response = requests.get(
         "https://kinopoiskapiunofficial.tech/api/v2.2/films/filters",
