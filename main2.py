@@ -55,7 +55,7 @@ def get_all_the_top_movie_pages():
     
 
 
-#output_of_all_genres
+#вывод всех жанров
 def we_get_all_genres():
     response = requests.get(
         "https://kinopoiskapiunofficial.tech/api/v2.2/films/filters",
@@ -67,14 +67,13 @@ def we_get_all_genres():
 
     all_genres = []
     for genre_hash in response["genres"]:
-        all_genres.append(Genres(genre_hash))
+        if genre_hash["genre"] != "":
+            all_genres.append([genre_hash["id"], genre_hash["genre"]])
         
-    for genre in all_genres:
-        print(f"{genre}".replace("25.", ""))
-    
+    print(all_genres)
     return all_genres
 
-we_get_all_genres()
+Film.genre(we_get_all_genres())
 
-for film in get_all_the_top_movie_pages():
-     print(f"{film}\n")
+# for film in get_all_the_top_movie_pages():
+#      print(f"{film}\n")
