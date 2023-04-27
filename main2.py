@@ -28,68 +28,96 @@ URL_API_FILTER = "https://kinopoiskapiunofficial.tech/api/v2.2/films"
 # for film in films:
 #     print(f"{film}\n")
 
+
+
+
+class GenreApiHandler:
+        #Проверка существует ли жанр
+    def checking_whether_a_genre_exists(selected_genre: int, all_genres: list):
+        for genre in all_genres:
+            if selected_genre == genre[0]:
+                return True
+
+        else:
+            return False     
+
+    #api запрос по жанру
+    def api_request_by_genre(genre: int, page:int = 1):
+        response = requests.get(
+                URL_API_FILTER,
+                params={"genres": genre, "page": page},
+                headers={"Content_type": "application/json", "X-API-KEY": API_KEY}
+            ).json()
+        return response
+
+    #распаковка api запроса фильмов по жанру
+    def unpacking_the_movie_request_api_by_genre(films_data: dict):
+        total_pages: int = films_data["totalPages"]
+        total_movies: int = films_data["total"]
+        films: list = []
+
+        for film_hash in films_data["items"]:
+            films.append(Film(film_hash))
+        
+        return films
+
+
+
 class Interface:
     #Пользовател выбирает номер жанра
     def user_chooses_a_genre():
-        print("Cписок жанров: ")
-        genres = we_get_all_genres()
-        Film.genre(genres)
-        
+        genres = Interface.show_a_list_of_genres()
         while True:
-            #Проверка вводит ли пользователь число
-            try:
-                selected_genre: int = int(input("Введитец цифру: "))
+            selected_genre = input("Введитец цифру: ")
+            if checking_whether_a_number_is_entered_by_the_user(selected_genre):
                 #Проверка есть ли это число в списке жанров, которые показываются пользователю
-                if checking_whether_a_genre_exists(selected_genre=selected_genre, all_genres=genres):
+                if GenreApiHandler.checking_whether_a_genre_exists(selected_genre=selected_genre, all_genres=genres):
                     return selected_genre
-                
                 else:
                     print('Вы ввели цифру, которая не находится в списке!')
-            
-            except ValueError:
-                print("Введите только цифру!")
-
-
+            else:
+                print("Вы ввели не число! Попробуйте снова")    
+        
+    
+    
+    #вывод фильмов по выбранному пользователем жанру
     def output_of_films_by_the_selected_genre(id_genre: int):
         genre: int = id_genre
-        films_hash: dict = api_request_by_genre(genre=genre)
-        films = unpacking_the_movie_request_api_by_genre(films_data=films_hash)
+        films_hash: dict = GenreApiHandler.api_request_by_genre(genre=genre)
+        films = GenreApiHandler.unpacking_the_movie_request_api_by_genre(films_data=films_hash)
         for film in films:
             print(f"{film}\n")
+    
+    #Вывод жанров в терминал
+    def output_of_genres_to_the_terminal(data_genre:list):
+        for id, genre in data_genre:
+            print(f"{id}. {genre}")
+
+    #Показывать список жанров
+    def show_a_list_of_genres():
+        print("Cписок жанров: ")
+        genres: list = we_get_all_genres()
+        Interface.output_of_genres_to_the_terminal(genres)
+        return genres
 
 
         
         
-#Проверка существует ли жанр
-def checking_whether_a_genre_exists(selected_genre: int, all_genres: list):
-    for genre in all_genres:
-        if selected_genre == genre[0]:
+
+
+#Проверка вводит ли пользователь число
+def checking_whether_a_number_is_entered_by_the_user():
+    selected_genre = function()
+    try:
+        number = int(selected_genre)
+
+        if isinstance(number, int):
+            print("Вы ввели число.")
             return True
 
-    else:
-        return False     
-
-#api запрос по жанру
-def api_request_by_genre(genre: int, page:int = 1):
-    response = requests.get(
-            URL_API_FILTER,
-            params={"genres": genre, "page": page},
-            headers={"Content_type": "application/json", "X-API-KEY": API_KEY}
-        ).json()
-    return response
-
-#распаковка api запроса фильмов по жанру
-def unpacking_the_movie_request_api_by_genre(films_data: dict):
-    total_pages: int = films_data["totalPages"]
-    total_movies: int = films_data["total"]
-    films: list = []
-
-    for film_hash in films_data["items"]:
-        films.append(Film(film_hash))
-    
-    return films
-    
-
+    except ValueError:
+        print("Вы не ввели число.")
+        return False
 
 #Получаем все страницы топовых фильмов
 def get_all_the_top_movie_pages():
