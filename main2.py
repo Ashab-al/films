@@ -85,6 +85,7 @@ class Interface:
     def output_of_films_by_the_selected_genre(id_genre: int):
         genre: int = id_genre
         films_hash: dict = GenreApiHandler.api_request_by_genre(genre=genre)
+
         films = GenreApiHandler.unpacking_the_movie_request_api_by_genre(films_data=films_hash)
         for film in films:
             print(f"{film}\n")
