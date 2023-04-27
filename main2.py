@@ -69,7 +69,9 @@ class Interface:
         genres = Interface.show_a_list_of_genres()
         while True:
             selected_genre = input("Введитец цифру: ")
+            
             if checking_whether_a_number_is_entered_by_the_user(selected_genre):
+                selected_genre = int(selected_genre)
                 #Проверка есть ли это число в списке жанров, которые показываются пользователю
                 if GenreApiHandler.checking_whether_a_genre_exists(selected_genre=selected_genre, all_genres=genres):
                     return selected_genre
