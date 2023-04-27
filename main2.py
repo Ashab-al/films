@@ -75,8 +75,7 @@ class Interface:
                     return selected_genre
                 else:
                     print('Вы ввели цифру, которая не находится в списке!')
-            else:
-                print("Вы ввели не число! Попробуйте снова")    
+               
         
     
     
@@ -106,8 +105,7 @@ class Interface:
 
 
 #Проверка вводит ли пользователь число
-def checking_whether_a_number_is_entered_by_the_user():
-    selected_genre = function()
+def checking_whether_a_number_is_entered_by_the_user(selected_genre):
     try:
         number = int(selected_genre)
 
