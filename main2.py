@@ -6,6 +6,8 @@ from film import Film
 API_KEY = "39fff5b9-9bad-4f10-8453-9473bf112d4e"
 URL_API = "https://kinopoiskapiunofficial.tech/api/v2.2/films/top"
 URL_API_FILTER = "https://kinopoiskapiunofficial.tech/api/v2.2/films"
+URL_API_SEARCH_BY_KEYWORD = "https://kinopoiskapiunofficial.tech/api/v2.1/films/search-by-keyword"
+
 
 # response = requests.get(
 #     URL_API,
@@ -50,8 +52,8 @@ class GenreApiHandler:
             ).json()
         return response
 
-    #распаковка api запроса фильмов по жанру
-    def unpacking_the_movie_request_api_by_genre(films_data: dict):
+    #распаковка api запроса фильмов 
+    def unpacking_the_movie_request_api(films_data: dict):
         total_pages: int = films_data["totalPages"]
         total_movies: int = films_data["total"]
         films: list = []
@@ -60,6 +62,26 @@ class GenreApiHandler:
             films.append(Film(film_hash))
         
         return films
+    
+    #распаковка api запроса фильмов для функции поиска по названию
+    def unpacking_the_movie_request_api_for_search_name(films_data: dict, pagescount: int):
+        total_pages = pagescount
+        films: list = []
+
+        for film_hash in films_data:
+            films.append(Film(film_hash))
+        
+        return films
+    
+    #Получить фильмы по ключевым словам
+    def get_movies_by_keywords(keywords):
+        response = requests.get(
+                URL_API_SEARCH_BY_KEYWORD,
+                params={"keyword": keywords},
+                headers={"Content_type": "application/json", "X-API-KEY": API_KEY}
+            ).json()
+        
+        return response
 
 
 
@@ -78,15 +100,12 @@ class Interface:
                 else:
                     print('Вы ввели цифру, которая не находится в списке!')
                
-        
-    
-    
     #вывод фильмов по выбранному пользователем жанру
     def output_of_films_by_the_selected_genre(id_genre: int):
         genre: int = id_genre
         films_hash: dict = GenreApiHandler.api_request_by_genre(genre=genre)
 
-        films = GenreApiHandler.unpacking_the_movie_request_api_by_genre(films_data=films_hash)
+        films = GenreApiHandler.unpacking_the_movie_request_api(films_data=films_hash)
         for film in films:
             print(f"{film}\n")
     
@@ -103,7 +122,31 @@ class Interface:
         return genres
 
 
+    # #Метод поиска по названию 1
+    # def name_search_method():
+    #     movie_keywords: str = str(input("Введите ключевые слова, для поиска фильмов:\n"))
+    #     movie_data = GenreApiHandler.get_movies_by_keywords(keywords=movie_keywords)
+    #     print(movie_data)
         
+    #     new_data_items = sorted(movie_data, key=lambda film: film["year"])
+    #     sorted_data |= new_data_items
+    #     films = GenreApiHandler.unpacking_the_movie_request_api(films_data=sorted_data)
+    #     for film in film:
+    #         print(f"{film}\n")
+
+    # Метод поиска по названию 2
+    def name_search_method():
+        movie_keywords: str = str(input("Введите ключевые слова, для поиска фильмов:\n"))
+        movie_data = GenreApiHandler.get_movies_by_keywords(keywords=movie_keywords)
+        #print(movie_data)
+        
+        # Check if each element in movie_data is a dictionary and if the "year" key exists
+        new_data_items = sorted(movie_data["films"], key=lambda film: film["year"])
+        sorted_data = new_data_items
+        
+        films = GenreApiHandler.unpacking_the_movie_request_api_for_search_name(films_data=sorted_data, pagescount=movie_data["pagesCount"])
+        for film in films:
+            print(f"{film}\n")    
         
 
 
@@ -164,10 +207,14 @@ def we_get_all_genres():
     
     return all_genres
 
+def main():
+    # test: int = Interface.user_chooses_a_genre()
+    # Interface.output_of_films_by_the_selected_genre(id_genre=test)
+    Interface.name_search_method()
+    
 
-test: int = Interface.user_chooses_a_genre()
-Interface.output_of_films_by_the_selected_genre(id_genre=test)
-
+if __name__ == "__main__":
+    main()
 #Film.genre(we_get_all_genres())
 
 # for film in get_all_the_top_movie_pages():
